@@ -1,0 +1,12 @@
+#!/usr/bin/env bash
+# First-boot only (see omarchy-firstboot-flatpak.service): Flathub + Bitwarden.
+# Retried every boot until it succeeds (done-file gates it).
+set -uo pipefail
+
+export PATH=/usr/sbin:/usr/bin:/sbin:/bin
+
+flatpak remote-add --if-not-exists flathub https://dl.flathub.org/repo/flathub.flatpakrepo || exit 1
+flatpak install -y --system flathub com.bitwarden.desktop || exit 1
+
+mkdir -p /var/lib
+touch /var/lib/.omarchy-firstboot-flatpak-done

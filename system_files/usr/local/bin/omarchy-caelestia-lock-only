@@ -1,0 +1,25 @@
+#!/usr/bin/env bash
+# Lock-only mode for Caelestia: hide its bar on every monitor so the Omarchy
+# bar stays the only bar. Caelestia keeps running for its lock/idle services.
+# Run at session start (Hyprland exec-once). Idempotent.
+set -uo pipefail
+
+CFG="${XDG_CONFIG_HOME:-$HOME/.config}/caelestia/shell.json"
+mkdir -p "$(dirname "$CFG")"
+[ -f "$CFG" ] || echo '{"bar":{"excludedScreens":[]},"background":{"enabled":false},"lock":{"enabled":true}}' > "$CFG"
+
+MONITORS=""
+if command -v hyprctl >/dev/null 2>&1; then
+  MONITORS="$(hyprctl monitors -j 2>/dev/null | jq -r '.[].name' 2>/dev/null || true)"
+fi
+
+if [ -z "$MONITORS" ]; then
+  echo "omarchy-caelestia-lock-only: no Hyprland monitors detected, leaving $CFG untouched" >&2
+  exit 0
+fi
+
+TMP="$(mktemp)"
+jq --raw-input --slurp 'split("\n") | map(select(length > 0))' < <(printf '%s\n' "$MONITORS") > "$TMP.lists" 2>/dev/null || exit 0
+jq --slurpfile screens "$TMP.lists" '.bar.excludedScreens = $screens[0]' "$CFG" > "$TMP" && mv "$TMP" "$CFG"
+rm -f "$TMP.lists" "$TMP"
+echo "omarchy-caelestia-lock-only: Caelestia bar excluded on: $(printf '%s ' "$MONITORS")"

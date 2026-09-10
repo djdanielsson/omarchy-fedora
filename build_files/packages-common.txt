@@ -1,0 +1,159 @@
+# Fedora 44 dnf equivalents for your Omarchy selection
+# Format: one package per line. Lines starting with # ignored by build.sh.
+# Arch name -> Fedora name notes inline.
+
+# --- Desktop UI (same as Omarchy for the moment) ---
+# Hyprland stack via agaspar/omedora-4 COPR (see build.sh). quickshell is stock Fedora 44.
+# Lock/idle differ from Omarchy: swaylock+swayidle (stock) instead of hyprlock+hypridle,
+# because mixing a second Hyprland COPR causes hyprutils version conflicts.
+hyprland
+hyprpicker
+hyprsunset
+swaylock
+swayidle
+qt6-qtwayland
+# Lock screen: Caelestia (COPR randalthor17/caelestia-fedora — built against plain
+# quickshell, unlike gmanka/caelestia which needs conflicting quickshell-git).
+# lock/idle services; bar is suppressed via excludedScreens (see skel shell.json
+# + omarchy-caelestia-lock-only). swaylock stays as fallback.
+caelestia-shell
+caelestia-cli
+xdg-desktop-portal-hyprland
+xdg-desktop-portal-gtk
+quickshell
+hyprland-guiutils
+uwsm
+mate-polkit
+sddm
+plymouth
+gvfs-mtp
+gvfs-nfs
+gvfs-smb
+gnome-keyring
+
+# --- Files (same as Omarchy) ---
+nautilus
+nautilus-python
+sushi
+ffmpegthumbnailer
+gnome-disk-utility
+
+# --- Browser / Terminal (your swap) ---
+firefox
+# warp installed via .rpm in build.sh, not dnf
+# foot, chromium deliberately omitted
+
+# --- Media: vlc + obs + imv (per 2026-09-10: keep imv) ---
+vlc
+obs-studio
+imv
+
+# --- Docs: evince only (per 2026-09-10: drop all LibreOffice) ---
+evince
+# libreoffice-* deliberately omitted
+
+# --- Printing / disks ---
+cups
+cups-filters
+system-config-printer
+dosfstools
+exfatprogs
+
+# --- Audio/Bluetooth/Network ---
+pipewire
+pipewire-alsa
+pipewire-jack-audio-connection-kit
+pipewire-pulseaudio
+wireplumber
+pamixer
+alsa-utils
+bluez
+bluez-tools
+NetworkManager
+avahi
+nss-mdns
+
+# --- system drivers: Intel iGPU only (your choice) ---
+# iwl*/WiFi firmware covered by linux-firmware below — no separate iwl pkgs on Fedora.
+intel-media-driver
+libva-intel-driver
+mesa-vulkan-drivers
+mesa-va-drivers
+linux-firmware
+thermald
+tuned-ppd
+brightnessctl
+ddcutil
+bolt
+# NOTE: tuned-ppd INSTEAD of power-profiles-daemon — caelestia-shell requires
+# tuned-ppd and the two conflict (both provide the PowerProfiles1 service).
+# Same D-Bus API, so desktop battery profiles keep working.
+
+# --- Containers: podman + distrobox (replace docker stack) ---
+podman
+podman-compose
+distrobox
+# docker, docker-compose, docker-buildx, lazydocker, ufw-docker deliberately omitted
+
+# --- Terminal CLI stuff: keep all TUIs ---
+bat
+eza
+fd-find
+fzf
+ripgrep
+jq
+btop
+du-dust
+dua-cli
+lazygit
+tmux
+starship
+zoxide
+yt-dlp
+fastfetch
+inxi
+tldr
+plocate
+wl-clipboard
+grim
+slurp
+ImageMagick
+qrencode
+zbar
+tesseract
+tesseract-langpack-eng
+whois
+usbutils
+socat
+inotify-tools
+python3-pip
+less
+man-db
+bash-completion
+# inetutils: not packaged on Fedora (telnet/ftp split out) — dropped; whois/usbutils kept.
+
+# --- Editors / AI (keep neovim + mise-managed agents, drop compilers) ---
+neovim
+git
+gh
+# clang, llvm, ruby, lua51, luarocks, tree-sitter-cli, dotnet-runtime deliberately omitted per your "no dev stack"
+# mise installed via install script; provides node/opencode/codex at first boot via user service
+
+# --- Fonts/themes (match Omarchy look) ---
+google-noto-sans-fonts
+google-noto-emoji-color-fonts
+google-noto-sans-cjk-fonts
+jetbrains-mono-fonts
+omedora-nerd-fonts
+fontawesome-fonts
+yaru-icon-theme
+# gnome-themes-extra: not packaged on Fedora — dropped (Adwaita + Omarchy themes cover it).
+
+# --- Misc Omarchy utilities ported ---
+# NOTE: tzupdate ships via pip (see build.sh), NOT dnf — no dnf line for it here.
+udiskie
+firewalld
+flatpak
+tailscale
+# bitwarden via flatpak com.bitwarden.desktop in build.sh (per 2026-09-10)
+# ufw -> firewalld on Fedora (native to Atomic)

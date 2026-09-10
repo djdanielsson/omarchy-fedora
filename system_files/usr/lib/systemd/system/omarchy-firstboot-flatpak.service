@@ -1,0 +1,16 @@
+[Unit]
+Description=Omarchy first-boot: add Flathub and install Bitwarden
+Documentation=https://github.com/caelestia-dots/shell
+After=network-online.target
+Wants=network-online.target
+# /var is per-machine state in bootc: flatpak content baked at build time does
+# NOT transfer, so install it here on first boot instead.
+ConditionPathExists=!/var/lib/.omarchy-firstboot-flatpak-done
+
+[Service]
+Type=oneshot
+ExecStart=/usr/local/bin/omarchy-firstboot-flatpak
+RemainsAfterExit=yes
+
+[Install]
+WantedBy=multi-user.target

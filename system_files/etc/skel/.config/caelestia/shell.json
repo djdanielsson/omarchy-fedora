@@ -1,0 +1,12 @@
+{
+  "_comment": "Omarchy-Fedora lock-only Caelestia config. Omarchy bar stays primary; Caelestia provides lock/idle. bar.excludedScreens is filled at login by omarchy-caelestia-lock-only with every Hyprland output so the Caelestia bar never draws.",
+  "bar": {
+    "excludedScreens": []
+  },
+  "background": {
+    "enabled": false
+  },
+  "lock": {
+    "enabled": true
+  }
+}

@@ -1,0 +1,75 @@
+name: build-bootc
+on:
+  push:
+    branches: [main]
+  pull_request:
+  workflow_dispatch:
+  schedule:
+    - cron: "0 6 * * 1" # weekly rebuild for Fedora updates
+
+env:
+  IMAGE_NAME: omarchy-fedora
+  REGISTRY: ghcr.io/${{ github.repository_owner }}
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      packages: write
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set tags
+        id: tags
+        run: |
+          echo "date=$(date -u +%Y%m%d)" >> "$GITHUB_OUTPUT"
+          echo "ver=44" >> "$GITHUB_OUTPUT"
+
+      - name: Login to GHCR
+        uses: redhat-actions/podman-login@v1
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Build and push container image (source of truth for updates)
+        run: |
+          podman build -f Containerfile \
+            -t ghcr.io/${{ github.repository_owner }}/omarchy-fedora:44 \
+            -t ghcr.io/${{ github.repository_owner }}/omarchy-fedora:${{ steps.tags.outputs.date }}-44 \
+            .
+          podman push ghcr.io/${{ github.repository_owner }}/omarchy-fedora:44
+          podman push ghcr.io/${{ github.repository_owner }}/omarchy-fedora:${{ steps.tags.outputs.date }}-44
+
+  # ISO is only the installer. It embeds the GHCR ref above,
+  # so systems installed from ISO track the container for `bootc upgrade`.
+  iso:
+    needs: build
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      packages: read
+    steps:
+      - name: Login to GHCR
+        uses: redhat-actions/podman-login@v1
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Build ISO with bootc-image-builder
+        run: |
+          mkdir -p ./output
+          sudo podman run --rm --privileged \
+            -v ./output:/output \
+            --security-opt label=type:unconfined_t \
+            quay.io/centos-bootc/bootc-image-builder:latest \
+            --type iso \
+            ghcr.io/${{ github.repository_owner }}/omarchy-fedora:44
+
+      - name: Upload ISO artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: omarchy-fedora-44-iso
+          path: ./output/*.iso

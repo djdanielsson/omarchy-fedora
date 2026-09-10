@@ -1,0 +1,23 @@
+#!/usr/bin/env bash
+# Lock the session with the Caelestia lock screen.
+# Usage: omarchy-lock  (bind to SUPER+L, call from swayidle, call before sleep)
+set -uo pipefail
+
+if ! pgrep -f "qs -c caelestia" >/dev/null 2>&1 && ! pgrep -x caelestia-shell >/dev/null 2>&1; then
+  if command -v caelestia >/dev/null 2>&1; then
+    caelestia shell -d >/dev/null 2>&1
+  else
+    qs -c caelestia -d >/dev/null 2>&1
+  fi
+  # wait for the shell IPC to come up (max ~5s)
+  for _ in $(seq 1 25); do
+    qs -c caelestia list >/dev/null 2>&1 && break
+    sleep 0.2
+  done
+fi
+
+if command -v caelestia >/dev/null 2>&1; then
+  exec caelestia shell lock lock
+else
+  exec qs -c caelestia ipc call lock lock
+fi

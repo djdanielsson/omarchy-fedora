@@ -1,0 +1,7 @@
+[Desktop Entry]
+Name=Omarchy-Fedora (Hyprland uwsm)
+Comment=Hyprland session managed by uwsm (ported from Omarchy /usr/share/omarchy/default/wayland-sessions/omarchy.desktop)
+Exec=uwsm start -g -1 -e -D Hyprland hyprland.desktop
+TryExec=uwsm
+Type=Application
+DesktopNames=Hyprland
