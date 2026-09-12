@@ -1,0 +1,4 @@
+-- Personal monitor overrides. Loaded after Omarchy-Fedora defaults.
+-- Example:
+-- hl.monitor({ name = "eDP-1", resolution = "2880x1800@90", position = "auto", scale = 1.5 })
+-- See https://wiki.hypr.land/Configuring/Basics/Monitors/

@@ -1,0 +1,37 @@
+# bootc-image-builder config — INTERACTIVE installer, no password in git.
+#
+# Why: BIB `--type iso` is UNATTENDED by default (embedded autopart + wipe,
+# never prompts for a user). The old version of this file worked around that
+# with [[customizations.user]] + a baked-in password hash — meaning a secret
+# in the repo and no prompt at install.
+#
+# This version does the opposite: an EMPTY kickstart forces Anaconda into
+# INTERACTIVE mode. BIB still injects the `ostreecontainer` line that installs
+# THIS image, but adds no clearpart/autopart/reboot flags, so Anaconda stops
+# at its hub and waits for you to:
+#   1. pick the disk (Automatic partitioning works fine),
+#   2. create your user + password (Users screen),
+#   3. click "Begin Installation". Nothing is written before that.
+#
+# Notes / quirks:
+# - Do NOT combine this with [[customizations.user]] — BIB rejects
+#   [customizations.user] + [customizations.installer.kickstart] together
+#   (osbuild/bootc-image-builder#528). User comes from the Anaconda screen.
+# - Custom partitioning: create partitions yourself and label /boot as `boot`.
+# - If you ever want fully unattended again (wipes disk, no prompt), replace
+#   this file with a [[customizations.user]] block + installation_device.
+#
+# Alternative you asked about (tmp password + force change on first boot):
+#   Keep [[customizations.user]] with password = "changeme", then expire it:
+#     RUN chage -d 0 omarchy
+#   First TTY/SSH login then forces `passwd` change. BUT: SDDM does NOT handle
+#   expired passwords — you'd have to Ctrl+Alt+F3, log in, change, return to
+#   GUI. And the tmp password lives in git history. Interactive (this file)
+#   avoids both problems, which is why it's the default.
+#
+# Refs:
+# - https://github.com/osbuild/bootc-image-builder#anaconda-iso-installer-options-installer-mapping
+# - https://supakeen.com/weblog/building-interactive-installer-bootc/
+
+[customizations.installer.kickstart]
+contents = ""

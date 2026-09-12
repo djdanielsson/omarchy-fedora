@@ -153,12 +153,12 @@ BarWidget {
     fixedHeight: root.vertical ? root.verticalLines.length * Style.bar.iconSlot : -1
     horizontalMargin: 8.75
     verticalPadding: 8.75
-    tooltipText: "Left-click for notifications \u00b7 Middle-click for calendar"
+    tooltipText: "Left-click for calendar + notifications \u00b7 Middle-click for notifications"
 
     onPressed: function(b) {
       if (b === Qt.RightButton) root.cycleFormat()
-      else if (b === Qt.MiddleButton) root.togglePanel()
-      else { if (root.bar) root.bar.run("omarchy-shell notifications showHistory") }
+      else if (b === Qt.MiddleButton) { if (root.bar) root.bar.run("omarchy-shell notifications showHistory") }
+      else { root.togglePanel(); if (root.bar) root.bar.run("omarchy-shell notifications showHistory") }
     }
 
     Column {

@@ -1,0 +1,20 @@
+#!/bin/bash
+
+# omarchy:summary=Lock the computer and turn off the display
+# omarchy:group=system
+# omarchy:name=lock
+# omarchy:examples=omarchy system lock
+
+omarchy-shell lock lock >/dev/null
+
+# Set keyboard layout to default (first layout)
+hyprctl switchxkblayout all 0 > /dev/null 2>&1
+
+# Bitwarden (flatpak) locks itself on idle/lock via its own timeout setting —
+# no lock call needed here (upstream 1Password block removed per spec).
+
+# Avoid running screensaver when locked
+pkill -x ttfx 2>/dev/null || true
+# ttfx handles SIGTERM asynchronously, so keep its terminal alive until it exits.
+timeout 1s pidwait -x ttfx 2>/dev/null || true
+pkill -f '[o]rg.omarchy.screensaver' 2>/dev/null || true

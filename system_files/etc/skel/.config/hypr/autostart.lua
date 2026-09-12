@@ -1,0 +1,5 @@
+-- Personal autostart. Loaded after Omarchy-Fedora defaults.
+-- Example:
+-- hl.on("hyprland.start", function()
+--   hl.exec_cmd("warp-terminal --start-as-daemon &")
+-- end)

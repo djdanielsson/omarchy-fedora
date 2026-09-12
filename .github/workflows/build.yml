@@ -51,6 +51,8 @@ jobs:
       contents: read
       packages: read
     steps:
+      - uses: actions/checkout@v4
+
       - name: Login to GHCR
         uses: redhat-actions/podman-login@v1
         with:
@@ -63,9 +65,12 @@ jobs:
           mkdir -p ./output
           sudo podman run --rm --privileged \
             -v ./output:/output \
+            -v ./iso-config.toml:/config.toml:ro \
             --security-opt label=type:unconfined_t \
             quay.io/centos-bootc/bootc-image-builder:latest \
             --type iso \
+            --rootfs btrfs \
+            --config /config.toml \
             ghcr.io/${{ github.repository_owner }}/omarchy-fedora:44
 
       - name: Upload ISO artifact
