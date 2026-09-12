@@ -287,3 +287,25 @@ Hyprland may show an approval prompt on first use — approve or ignore.
   streaming numbers; NVMe read ~1650 / write ~1000 MB/s.
 * **LocalSend (open AirDrop alt):** Flathub `org.localsend.localsend_app`
   added to first-boot installs; firewall 53317/tcp+udp opened in image.
+
+* **Network menu QR + Send Files:** added `setup.network.qr` (summons wifiqr
+  panel) and `setup.network.send` (launches LocalSend) to the default menu so
+  sharing sits next to Wi-Fi controls.
+
+* **Wi-Fi panel Send button:** `sendAction` beside the QR action in the network
+  hero (`build.sh` 7e, mouse-only to leave keyboard index math alone).
+  Keyboard path stays Setup > Network > Send Files.
+
+* **Portal pickers sized:** file choosers opened fullscreen-ish on 1080p.
+  Pinned `xdg-desktop-portal-gtk` to centered 900x620 (live looknfeel + skel).
+
+## Fixes 2026-09-12 (round 8 — lumon-tux theme, dark default, wifi send button)
+
+* **lumon-tux theme:** new `usr/share/omarchy-fedora/themes/lumon-tux/`
+  (electric-cyan `#46d4f2` accent, amber secondary, near-black grounds,
+  cyan Hyprland borders) matched to the Tux-glow wallpaper, which ships in its
+  `backgrounds/` (live-tested via user theme copy first).
+* **Dark default:** `etc/dconf/db/local.d/00-darkmode` (Adwaita-dark +
+  prefer-dark) + `dconf update` in build; live system already reported dark.
+* **Wi-Fi panel Send button + menu QR/Send entries** (see round 7) committed;
+  LocalSend firstboot override generalized to `--filesystem=home`.

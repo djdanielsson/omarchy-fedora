@@ -17,6 +17,11 @@ for attempt in 1 2 3 4 5; do
 done
 flatpak install -y --system flathub com.bitwarden.desktop || exit 1
 flatpak install -y --system flathub org.localsend.localsend_app || exit 1
+# LocalSend sandbox can only see xdg-download, which fails to mount on Atomic
+# (/home -> /var/home symlink); without this, receives log to history but the
+# save silently fails. Live-verified with the explicit path; image uses `home`
+# so it works for any install username.
+flatpak override --system org.localsend.localsend_app --filesystem=home || true
 
 mkdir -p /var/lib
 touch /var/lib/.omarchy-firstboot-flatpak-done

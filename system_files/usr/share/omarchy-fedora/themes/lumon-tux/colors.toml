@@ -1,0 +1,36 @@
+mode = "dark"
+
+# lumon-tux: Lumon matched to the Tux-glow wallpaper — electric cyan primary,
+# warm amber secondary, near-black grounds (2026-09-12).
+accent = "#46d4f2"
+selection = "#14384a"
+muted = "#23404f"
+
+background = "#0a1116"
+dark_background = "#070d12"
+darker_background = "#04080b"
+lighter_background = "#12202b"
+
+foreground = "#d6e2ee"
+dark_foreground = "#4d86b0"
+light_foreground = "#d6e2ee"
+bright_foreground = "#f2fcff"
+
+active_border_color = "#d5f2ff"
+active_tab_background = "#1fa8d8"
+
+red = "#e06c5a"
+yellow = "#d8b45a"
+orange = "#f0a83e"
+green = "#4fd6a5"
+cyan = "#6fe3ff"
+blue = "#35b8e8"
+magenta = "#7fb8f0"
+brown = "#456475"
+
+bright_red = "#f08a76"
+bright_yellow = "#e8c876"
+bright_green = "#7fe8bd"
+bright_cyan = "#a5f0ff"
+bright_blue = "#d5f2ff"
+bright_magenta = "#a5ccf5"

@@ -20,6 +20,8 @@
   "setup.network.dns.cloudflare": {"icon":"󰅟","label":"Cloudflare","checked":"[[ \"$(omarchy-dns)\" == \"Cloudflare\" ]]","action":"omarchy-dns Cloudflare"},
   "setup.network.dns.google": {"icon":"󰊭","label":"Google","checked":"[[ \"$(omarchy-dns)\" == \"Google\" ]]","action":"omarchy-dns Google"},
   "setup.network.dns.custom": {"icon":"","label":"Custom","checked":"[[ \"$(omarchy-dns)\" == \"Custom\" ]]","action":"omarchy-launch-floating-terminal-with-presentation 'omarchy-dns Custom'"},
+  "setup.network.qr": {"icon":"󰐲","label":"QR Code","aliases":["wifi-qr"],"action":"omarchy-shell shell summon omarchy.wifiqr"},
+  "setup.network.send": {"icon":"󰥦","label":"Send Files","aliases":["localsend","share-files"],"description":"Nearby sharing via LocalSend","action":"flatpak run org.localsend.localsend_app"},
   "setup.power": {"icon":"󰂄","label":"Power","aliases":["power","power-profile"]},
   "setup.power.profiles": {"icon":"","label":"Profiles","provider":"power-profiles"},
   "style": {"icon":"","label":"Style"},

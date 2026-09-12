@@ -1,0 +1,5 @@
+# System-wide dark-mode default so GTK apps and websites (via
+# xdg-desktop-portal color-scheme) see dark out of the box (2026-09-12).
+[org/gnome/desktop/interface]
+gtk-theme='Adwaita-dark'
+color-scheme='prefer-dark'

@@ -119,6 +119,9 @@ flatpak install -y --system flathub com.bitwarden.desktop || echo "WARNING: bitw
 mkdir -p /etc/xdg/xdg-terminal-exec
 printf 'warp.desktop\n' > /etc/xdg/xdg-terminal-exec/terminal.list || true
 
+# 7a. Compile dconf defaults (dark mode in etc/dconf/db/local.d/).
+dconf update 2>/dev/null || true
+
 # 7b. SDDM "omarchy" theme = stock maldives + Lumon wallpaper (2026-09-12).
 # Vendoring the whole theme in git is wasteful; derive it at build time.
 if [[ -d /usr/share/sddm/themes/maldives ]]; then
@@ -186,6 +189,41 @@ subs = [
 for old, new in subs:
     assert s.count(old) == 1, f"pattern not unique/found: {old}"
     s = s.replace(old, new, 1)
+open(p, "w", encoding="utf-8").write(s)
+EOF
+fi
+
+# 7e. Send-files button beside the Wi-Fi QR action (2026-09-12). Inserting
+# into the header index math would renumber keyboard nav, so the button is
+# mouse-only; keyboard users use Setup > Network > Send Files (menu jsonc).
+NET_PANEL=/usr/share/omarchy-fedora/shell/plugins/panels/network/Panel.qml
+if [[ -f $NET_PANEL ]]; then
+  python3 - "$NET_PANEL" <<'EOF' || echo "WARNING: network Panel.qml send-button patch failed"
+import sys
+p = sys.argv[1]
+s = open(p, encoding="utf-8").read()
+old = """          Button {
+            id: speedAction"""
+new = """          Button {
+            id: sendAction
+            // Fedora addition: nearby sharing next to the QR code.
+            // Mouse-only on purpose — keyboard users reach it through
+            // Setup > Network > Send Files, so the header index math stays untouched.
+            iconText: "󰥦"
+            tooltipText: "Send files (LocalSend)"
+            foreground: root.bar.foreground
+            fontFamily: root.bar.fontFamily
+            iconSize: Style.font.subtitle * 1.5
+            horizontalPadding: Style.space(5)
+            verticalPadding: Style.space(2)
+            Layout.alignment: Qt.AlignVCenter
+            onClicked: { if (root.bar) root.bar.run("flatpak run org.localsend.localsend_app") }
+          }
+
+          Button {
+            id: speedAction"""
+assert old in s, "speedAction anchor not found"
+s = s.replace(old, new, 1)
 open(p, "w", encoding="utf-8").write(s)
 EOF
 fi
