@@ -1,12 +1,22 @@
 #!/usr/bin/env bash
-# First-boot only (see omarchy-firstboot-flatpak.service): Flathub + Bitwarden.
-# Retried every boot until it succeeds (done-file gates it).
+# First-boot only (see omarchy-firstboot-flatpak.service): Flathub + Bitwarden
+# + LocalSend. Retried every boot until it succeeds (done-file gates it).
+# 2026-09-12 fix: boot races network-online (DNS not ready) — retry remote-add
+# a few times instead of failing the whole unit on first transient error.
 set -uo pipefail
 
 export PATH=/usr/sbin:/usr/bin:/sbin:/bin
 
-flatpak remote-add --if-not-exists flathub https://dl.flathub.org/repo/flathub.flatpakrepo || exit 1
+for attempt in 1 2 3 4 5; do
+  if flatpak remote-add --if-not-exists flathub https://dl.flathub.org/repo/flathub.flatpakrepo; then
+    break
+  fi
+  echo "omarchy-firstboot-flatpak: flathub remote-add attempt $attempt failed, retrying..." >&2
+  sleep $((attempt * 5))
+  [[ $attempt -eq 5 ]] && exit 1
+done
 flatpak install -y --system flathub com.bitwarden.desktop || exit 1
+flatpak install -y --system flathub org.localsend.localsend_app || exit 1
 
 mkdir -p /var/lib
 touch /var/lib/.omarchy-firstboot-flatpak-done

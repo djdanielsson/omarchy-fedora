@@ -1,0 +1,40 @@
+#!/bin/bash
+# powerprofilesctl compat shim for Fedora tuned-ppd images.
+# tuned-ppd and power-profiles-daemon conflict (both provide PowerProfiles1),
+# and caelestia-shell requires tuned-ppd — so PPD cannot be installed.
+# This shim exposes the subset Omarchy uses (get/set/list) backed by the
+# tuned-ppd D-Bus API (net.hadess.PowerProfiles), which is wire-compatible.
+# Verified 2026-09-12 on T14s AX201: get/set/list + omarchy-powerprofiles-*
+# round-trip against tuned-ppd (balanced/power-saver/performance).
+set -uo pipefail
+BUS="net.hadess.PowerProfiles"
+OBJ="/net/hadess/PowerProfiles"
+IFACE="net.hadess.PowerProfiles"
+get_active() {
+  busctl --system get-property "$BUS" "$OBJ" "$IFACE" ActiveProfile 2>/dev/null | sed -n 's/^s "\(.*\)"$/\1/p'
+}
+cmd="${1:-}"
+case "$cmd" in
+  get)
+    get_active
+    ;;
+  set)
+    profile="${2:-}"
+    if [[ -z "$profile" ]]; then echo "Usage: powerprofilesctl set <profile>" >&2; exit 1; fi
+    exec busctl --system set-property "$BUS" "$OBJ" "$IFACE" ActiveProfile s "$profile"
+    ;;
+  list)
+    active="$(get_active)"
+    for p in performance balanced power-saver; do
+      if [[ "$p" == "$active" ]]; then printf '* %s:\n' "$p"; else printf '  %s:\n' "$p"; fi
+    done
+    ;;
+  ""|-h|--help|help)
+    echo "Usage: powerprofilesctl {get|set <profile>|list}" >&2
+    exit 1
+    ;;
+  *)
+    echo "Unknown command: $cmd" >&2
+    exit 1
+    ;;
+esac

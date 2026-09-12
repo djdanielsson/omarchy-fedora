@@ -1,0 +1,8 @@
+#%PAM-1.0
+# Omarchy lock screen fingerprint auth (quickshell PamContext
+# "omarchy-lock-fingerprint"). The shell only offers touch-to-unlock when this
+# file exists AND the user has enrolled fingers (fprintd-enroll).
+# Upstream uses `account include system-local-login` (Arch); Fedora equivalent
+# is system-auth. Verified 2026-09-12 on T14s (Synaptics 06cb:00bd).
+auth       required                    pam_fprintd.so
+account    include                     system-auth

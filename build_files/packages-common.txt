@@ -23,8 +23,13 @@ xdg-desktop-portal-gtk
 quickshell
 hyprland-guiutils
 uwsm
+qt6-qtimageformats
+# qt6-qtimageformats: Qt WebP decoding. Every Lumon wallpaper is .webp —
+# without it the desktop AND lock screen fall back to a flat color
+# (verified 2026-09-12: "Unsupported image format" in shell log).
 mate-polkit
 sddm
+sddm-themes
 plymouth
 gvfs-mtp
 gvfs-nfs
@@ -67,27 +72,43 @@ pipewire-pulseaudio
 wireplumber
 pamixer
 alsa-utils
+alsa-sof-firmware
+alsa-firmware
 bluez
 bluez-tools
 NetworkManager
+NetworkManager-wifi
+wpa_supplicant
+wireless-regdb
+iw
 avahi
 nss-mdns
 
 # --- system drivers: Intel iGPU only (your choice) ---
-# iwl*/WiFi firmware covered by linux-firmware below — no separate iwl pkgs on Fedora.
+# Fedora splits wifi firmware out of linux-firmware (weak deps not installed
+# on bootc minimal). AX201 (02f0/0070) needs iwlwifi-mvm-firmware (verified
+# 2026-09-12: without it, iwlwifi fails "no suitable firmware", no wlan0).
+# Include the full Intel set + legacy so the same image works across machines.
 intel-media-driver
 libva-intel-driver
 mesa-vulkan-drivers
 mesa-va-drivers
 linux-firmware
+iwlwifi-mvm-firmware
+iwlwifi-mld-firmware
+iwlwifi-dvm-firmware
+iwlegacy-firmware
 thermald
+tuned
 tuned-ppd
 brightnessctl
 ddcutil
 bolt
 # NOTE: tuned-ppd INSTEAD of power-profiles-daemon — caelestia-shell requires
 # tuned-ppd and the two conflict (both provide the PowerProfiles1 service).
-# Same D-Bus API, so desktop battery profiles keep working.
+# Same D-Bus API, so desktop battery profiles keep working via the
+# powerprofilesctl shim + omarchy-powerprofiles-list/set in
+# system_files/usr/local/bin (2026-09-12 fix — PPD CLI can't be installed).
 
 # --- Containers: podman + distrobox (replace docker stack) ---
 podman
@@ -130,6 +151,12 @@ python3-pip
 less
 man-db
 bash-completion
+perl-JSON-PP
+gum
+libxkbcommon-utils
+# libxkbcommon-utils: xkbcli for the keybindings picker (resolves code: binds).
+# perl-JSON-PP: omarchy-menu-select (SUPER+K search) parses JSON via perl.
+# gum: future menu presentation flows (floating-terminal wrapper is minimal for now).
 # inetutils: not packaged on Fedora (telnet/ftp split out) — dropped; whois/usbutils kept.
 
 # --- Editors / AI (keep neovim + mise-managed agents, drop compilers) ---
@@ -155,5 +182,9 @@ udiskie
 firewalld
 flatpak
 tailscale
+rofi
+# rofi explicitly kept as fallback launcher (SUPER+D uses native omarchy-menu
+# apps by default; rofi -show drun still works when the shell is down).
+# fuzzel stays via caelestia-cli dep; wofi pulled as needed.
 # bitwarden via flatpak com.bitwarden.desktop in build.sh (per 2026-09-10)
 # ufw -> firewalld on Fedora (native to Atomic)

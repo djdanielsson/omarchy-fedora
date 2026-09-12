@@ -1,0 +1,13 @@
+[Unit]
+Description=Omarchy first-run GitHub setup (once per user)
+After=graphical-session.target
+Wants=graphical-session.target
+ConditionPathExists=!%h/.local/state/omarchy/setup-github-done
+
+[Service]
+Type=oneshot
+# Floating terminal with the interactive setup; script exits quietly without a TTY.
+ExecStart=/usr/bin/uwsm-app -- xdg-terminal-exec --app-id=org.omarchy.github-setup -e /usr/local/bin/omarchy-setup-github
+
+[Install]
+WantedBy=default.target

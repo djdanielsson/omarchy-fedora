@@ -28,9 +28,15 @@ dnf install -y \
   https://download1.rpmfusion.org/nonfree/fedora/rpmfusion-nonfree-release-44.noarch.rpm || echo "WARNING: rpmfusion install failed"
 
 # Tailscale repo (per 2026-09-10: tailscale wanted, Intel-only image)
-dnf config-manager addrepo --from-repofile=https://pkgs.tailscale.com/stable/fedora/tailscale.repo || \
-  curl -fsSL https://pkgs.tailscale.com/stable/fedora/tailscale.repo -o /etc/yum.repos.d/tailscale.repo || \
-  echo "WARNING: tailscale repo setup failed"
+# 2026-09-12 fix: import repo GPG key non-interactively, otherwise every dnf
+# run prompts "Is this ok [y/N]" + "repomd.xml GPG signature verification
+# error: Signing key not found" (seen live on T14s).
+rpm --import https://pkgs.tailscale.com/stable/fedora/repo.gpg || echo "WARNING: tailscale key import failed"
+if [[ ! -f /etc/yum.repos.d/tailscale.repo ]]; then
+  dnf config-manager addrepo --from-repofile=https://pkgs.tailscale.com/stable/fedora/tailscale.repo || \
+    curl -fsSL https://pkgs.tailscale.com/stable/fedora/tailscale.repo -o /etc/yum.repos.d/tailscale.repo || \
+    echo "WARNING: tailscale repo setup failed"
+fi
 
 dnf update -y
 
@@ -65,17 +71,33 @@ systemctl enable NetworkManager.service || true
 systemctl enable bluetooth.service || true
 systemctl enable cups.service || true
 systemctl enable thermald.service || true
+systemctl enable tuned.service || true
 systemctl enable tuned-ppd.service || true
 systemctl enable firewalld.service || true
+# LocalSend (LAN share, Flathub at first boot): allow its port through the
+# default public zone in the image so discovery works out of the box.
+firewall-cmd --permanent --add-port=53317/tcp 2>/dev/null || true
+firewall-cmd --permanent --add-port=53317/udp 2>/dev/null || true
 systemctl enable podman.socket || true
 systemctl enable tailscaled.service || true
 # First-boot flatpak provisioning (/var is local state — see service file)
 systemctl enable omarchy-firstboot-flatpak.service || true
+# First-run per-user GitHub setup prompt (runs once on first login)
+systemctl --global enable omarchy-firstrun-github.service || true
+# Auto timezone from location (tzupdate via timer + NM dispatcher)
+systemctl enable omarchy-tzupdate.timer || true
+# sudoers for passwordless desktop helpers (DNS switch from UI)
+chmod 0440 /etc/sudoers.d/omarchy-dns 2>/dev/null || true
 # Caelestia shell (lock screen) autostart if the COPR ships a user unit
 systemctl --global enable caelestia-shell.service 2>/dev/null || true
 # bootc auto-update check (image-mode updates come from GHCR container, not dnf)
 # Weekly GHCR rebuild + `bootc upgrade` on client pulls it. Enable timer for staged check.
 systemctl enable bootc-fetch-apply-updates.timer || true
+
+# Fingerprint auth via Fedora-native authselect (sudo through system-auth).
+# No enrolled fingers at build time; pam_fprintd ignores and password applies
+# until the user runs fprintd-enroll. Idempotent.
+authselect enable-feature with-fingerprint || echo "WARNING: authselect fingerprint failed"
 
 # 5b. Flatpak + Flathub (per 2026-09-10: yes to flatpak) + Bitwarden
 flatpak remote-add --if-not-exists flathub https://dl.flathub.org/repo/flathub.flatpakrepo || true
@@ -89,6 +111,77 @@ flatpak install -y --system flathub com.bitwarden.desktop || echo "WARNING: bitw
 # 7. xdg-terminal-exec default -> warp (overrides Omarchy foot default)
 mkdir -p /etc/xdg/xdg-terminal-exec
 printf 'warp.desktop\n' > /etc/xdg/xdg-terminal-exec/terminal.list || true
+
+# 7b. SDDM "omarchy" theme = stock maldives + Lumon wallpaper (2026-09-12).
+# Vendoring the whole theme in git is wasteful; derive it at build time.
+if [[ -d /usr/share/sddm/themes/maldives ]]; then
+  rm -rf /usr/share/sddm/themes/omarchy
+  cp -r /usr/share/sddm/themes/maldives /usr/share/sddm/themes/omarchy
+  sed -i 's|^background=.*|background=/usr/share/omarchy-fedora/themes/lumon/backgrounds/02-opinions-equally.webp|' /usr/share/sddm/themes/omarchy/theme.conf
+  sed -i 's/^Name=.*/Name=Omarchy/; s/^Theme-Id=.*/Theme-Id=omarchy/' /usr/share/sddm/themes/omarchy/metadata.desktop
+fi
+
+# 7c. Bluetooth bar button must survive rfkill-off (2026-09-12).
+# rfkill block unpowers the Intel USB BT device (usb 1-10 disconnect), so
+# BlueZ reports no adapter and `visible: adapter !== null` hides the button
+# exactly when the user needs it to toggle back on. Keep it always visible
+# with the off icon instead.
+BT_PANEL=/usr/share/omarchy-fedora/shell/plugins/panels/bluetooth/Panel.qml
+if [[ -f $BT_PANEL ]]; then
+  sed -i 's|if (!adapter) return ""|if (!adapter) return "󰂲"|' "$BT_PANEL"
+  python3 - "$BT_PANEL" <<'EOF' || echo "WARNING: bluetooth Panel.qml visible patch failed"
+import sys
+p = sys.argv[1]
+s = open(p, encoding="utf-8").read()
+old = "visible: adapter !== null"
+assert old in s, "visible gate not found"
+s = s.replace(old, "// Fedora fix (see 7c above): keep button to re-enable.\n  visible: true", 1)
+old_fn = """  function toggleBluetooth() {
+    if (!adapter) return
+    Quickshell.execDetached(["omarchy-bluetooth-power", adapter.enabled ? "off" : "on"])
+  }"""
+new_fn = """  function toggleBluetooth() {
+    // Fedora fix: no adapter (rfkill-off) means direction is "on".
+    Quickshell.execDetached(["omarchy-bluetooth-power", adapter && adapter.enabled ? "off" : "on"])
+  }"""
+assert old_fn in s, "toggle fn not found"
+s = s.replace(old_fn, new_fn, 1)
+old_sw = """          ToggleSwitch {
+            id: powerSwitch
+            visible: !!root.adapter"""
+new_sw = """          ToggleSwitch {
+            id: powerSwitch
+            // Fedora fix: keep the switch with no adapter, else no way back on.
+            visible: true"""
+assert old_sw in s, "power switch not found"
+s = s.replace(old_sw, new_sw, 1)
+open(p, "w", encoding="utf-8").write(s)
+EOF
+fi
+
+# 7d. Calendar popup ~30% smaller (2026-09-12): at 560 wide it eats half a
+# 1080p screen. Scale cells + hero + popup together so nothing clips.
+CAL_PANEL=/usr/share/omarchy-fedora/shell/plugins/panels/clock/Panel.qml
+if [[ -f $CAL_PANEL ]]; then
+  python3 - "$CAL_PANEL" <<'EOF' || echo "WARNING: clock Panel.qml scale patch failed"
+import sys
+p = sys.argv[1]
+s = open(p, encoding="utf-8").read()
+subs = [
+  ("readonly property int cellWidth: Style.space(52)", "readonly property int cellWidth: Style.space(36)"),
+  ("readonly property int cellHeight: Style.space(34)", "readonly property int cellHeight: Style.space(24)"),
+  ("readonly property int weekColumnWidth: Style.space(32)", "readonly property int weekColumnWidth: Style.space(22)"),
+  ("readonly property int gutterWidth: Style.space(14)", "readonly property int gutterWidth: Style.space(10)"),
+  ("contentWidth: panel.fittedContentWidth(Style.space(560))", "contentWidth: panel.fittedContentWidth(Style.space(392))"),
+  ("font.pixelSize: 48", "font.pixelSize: 34"),
+  ("font.pixelSize: 52", "font.pixelSize: 36"),
+]
+for old, new in subs:
+    assert s.count(old) == 1, f"pattern not unique/found: {old}"
+    s = s.replace(old, new, 1)
+open(p, "w", encoding="utf-8").write(s)
+EOF
+fi
 
 # 8. Cleanup
 dnf clean all

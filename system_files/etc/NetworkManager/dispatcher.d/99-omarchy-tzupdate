@@ -1,0 +1,6 @@
+#!/bin/bash
+# NetworkManager dispatcher: refresh timezone when connectivity changes
+# (travel, VPN, dock/undock). Runs as root; quiet unless it fails.
+if [[ $2 == "connectivity-change" && $CONNECTIVITY_STATE == "FULL" ]]; then
+  systemctl start omarchy-tzupdate.service 2>/dev/null || /usr/local/bin/tzupdate 2>/dev/null &
+fi

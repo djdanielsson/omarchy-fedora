@@ -1,0 +1,7 @@
+#!/bin/bash
+# omarchy:summary=Launch a floating terminal (Fedora minimal port)
+# omarchy:args=<command>
+# Upstream runs gum presentation (logo/done); Fedora image has no
+# omarchy-show-logo/done yet, so run the command directly in a floating TUI.
+# Used by network DNS Custom flow and future menu install flows.
+exec omarchy-launch-tui bash -c "$*"

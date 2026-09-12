@@ -1,0 +1,28 @@
+{
+  // Omarchy-Fedora minimal menu (ported 2026-09-12).
+  // Upstream quattro ships ~400 rows with Arch-only helpers (pacman/AUR,
+  // omarchy-install-*, webapps). This Fedora image only vendors a subset of
+  // bin/, so ship the working subset: without this file the shell falls back
+  // to an empty root card and `omarchy-menu toggle apps` shows nothing.
+  // IDs mirror upstream so future ports can drop in verbatim.
+  "apps": {"icon":"󰀻","label":"Apps","aliases":["app","applications"],"provider":"apps"},
+  "system": {"icon":"","label":"System","aliases":["power-menu"]},
+  "system.lock": {"icon":"","label":"Lock","action":"omarchy-system-lock"},
+  "system.suspend": {"icon":"󰒲","label":"Suspend","action":"systemctl suspend"},
+  "system.reboot": {"icon":"󰜉","label":"Reboot","action":"systemctl reboot"},
+  "system.shutdown": {"icon":"󰐥","label":"Shutdown","action":"systemctl poweroff"},
+  "learn": {"icon":"󰧑","label":"Learn"},
+  "learn.keybindings": {"icon":"","label":"Keybindings","action":"omarchy-menu-keybindings"},
+  "setup": {"icon":"","label":"Setup","aliases":["settings"]},
+  "setup.network": {"icon":"󰛳","label":"Network","aliases":["network"]},
+  "setup.network.dns": {"icon":"󰇖","label":"DNS","aliases":["dns"]},
+  "setup.network.dns.dhcp": {"icon":"󰩟","label":"DHCP","checked":"[[ \"$(omarchy-dns)\" == \"DHCP\" ]]","action":"omarchy-dns DHCP"},
+  "setup.network.dns.cloudflare": {"icon":"󰅟","label":"Cloudflare","checked":"[[ \"$(omarchy-dns)\" == \"Cloudflare\" ]]","action":"omarchy-dns Cloudflare"},
+  "setup.network.dns.google": {"icon":"󰊭","label":"Google","checked":"[[ \"$(omarchy-dns)\" == \"Google\" ]]","action":"omarchy-dns Google"},
+  "setup.network.dns.custom": {"icon":"","label":"Custom","checked":"[[ \"$(omarchy-dns)\" == \"Custom\" ]]","action":"omarchy-launch-floating-terminal-with-presentation 'omarchy-dns Custom'"},
+  "setup.power": {"icon":"󰂄","label":"Power","aliases":["power","power-profile"]},
+  "setup.power.profiles": {"icon":"","label":"Profiles","provider":"power-profiles"},
+  "style": {"icon":"","label":"Style"},
+  "trigger": {"icon":"󱓞","label":"Trigger"},
+  "trigger.capture.screenshot": {"icon":"","label":"Screenshot","action":"omarchy-capture-screenshot"}
+}

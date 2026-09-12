@@ -1,0 +1,18 @@
+#!/bin/bash
+# omarchy:summary=Check whether Fedora updates are available.
+# Fedora bootc port of upstream omarchy-update-available (which uses pacman).
+# Reports pending Flatpak updates (user-actionable). OS image updates arrive
+# via `bootc upgrade` from GHCR (see omarchy-update); detecting a staged image
+# needs root, so the widget only tracks Flatpak here.
+# Contract: print lines + exit 0 when updates exist, else "up to date" + exit 1.
+set -uo pipefail
+
+updates="$(flatpak remote-ls --updates --columns=application 2>/dev/null | grep -v '^$' || true)"
+
+if [[ -n $updates ]]; then
+  printf '%s\n' "$updates"
+  exit 0
+else
+  echo "System is up to date"
+  exit 1
+fi

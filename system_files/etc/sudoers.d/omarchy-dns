@@ -1,0 +1,4 @@
+# Passwordless omarchy-dns for the desktop (NetworkManager + resolved drop-ins).
+# The UI calls `omarchy-dns <provider>` via `bash -c` with no terminal, so it
+# re-execs via sudo; this grants exactly that path. pkexec remains the fallback.
+ALL ALL=(root) NOPASSWD: /usr/local/bin/omarchy-dns *

@@ -1,0 +1,11 @@
+#!/bin/bash
+# omarchy:summary=Apply Fedora updates (Flatpak now, image on next boot)
+# Fedora bootc port of upstream omarchy-update (which runs pacman).
+# Flatpak apps update in place; the OS image itself updates via
+# `bootc upgrade` (GHCR :44) + reboot. Safe to run from the update widget.
+set -uo pipefail
+
+flatpak update -y --system
+echo
+echo "Flatpak updates done."
+echo "OS image: run 'sudo bootc upgrade --apply --reboot' to fetch + reboot into the latest image."

@@ -11,6 +11,11 @@ ConditionPathExists=!/var/lib/.omarchy-firstboot-flatpak-done
 Type=oneshot
 ExecStart=/usr/local/bin/omarchy-firstboot-flatpak
 RemainsAfterExit=yes
+# Retry transient boot-time network/DNS failures in-unit too (script also
+# retries remote-add; done-file still gates to run-once on success).
+Restart=on-failure
+RestartSec=30
+StartLimitBurst=5
 
 [Install]
 WantedBy=multi-user.target

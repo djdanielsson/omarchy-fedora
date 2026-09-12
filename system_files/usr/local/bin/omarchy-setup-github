@@ -1,0 +1,45 @@
+#!/bin/bash
+# omarchy:summary=First-run GitHub setup (username, email, gh auth)
+# Runs once per user on first graphical login (see
+# omarchy-firstrun-github.service). Idempotent: exits quietly when already
+# configured or when there is no terminal to prompt on.
+set -uo pipefail
+
+DONE_FILE="${XDG_STATE_HOME:-$HOME/.local/state}/omarchy/setup-github-done"
+[[ -f $DONE_FILE ]] && exit 0
+
+# No prompt possible (e.g. launched without a terminal) — defer to next login.
+if [[ ! -t 0 ]]; then
+  exit 0
+fi
+
+echo "=== Omarchy-Fedora GitHub setup ==="
+echo "Configures git user.name/email and GitHub CLI auth. Press Enter to skip any step."
+echo
+
+read -r -p "GitHub username (empty to skip): " GH_USER || true
+read -r -p "GitHub email (empty to skip): " GH_EMAIL || true
+
+if [[ -n ${GH_USER:-} ]]; then
+  git config --global user.name "$GH_USER" && echo "git user.name = $GH_USER"
+fi
+if [[ -n ${GH_EMAIL:-} ]]; then
+  git config --global user.email "$GH_EMAIL" && echo "git user.email = $GH_EMAIL"
+fi
+
+if command -v gh >/dev/null 2>&1; then
+  if gh auth status >/dev/null 2>&1; then
+    echo "gh already authenticated."
+  else
+    echo
+    echo "Starting 'gh auth login' (web flow) — follow the prompts, Ctrl-C to skip."
+    gh auth login || echo "gh auth skipped."
+  fi
+else
+  echo "gh not installed, skipping GitHub CLI auth."
+fi
+
+mkdir -p "$(dirname "$DONE_FILE")"
+touch "$DONE_FILE"
+echo "Done. (Remove $DONE_FILE to run again.)"
+read -r -p "Press Enter to close." _ || true
