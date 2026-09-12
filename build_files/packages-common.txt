@@ -40,26 +40,34 @@ gnome-disk-utility
 
 # --- Browser / Terminal (your swap) ---
 firefox
-# warp installed via .rpm in build.sh, not dnf
+xdg-terminal-exec
+# warp installed via .rpm in build.sh, not dnf. No fallback terminal per
+# owner choice — Warp only. NOTE: if Warp fails (no network/GPU/login),
+# use TTY (Ctrl+Alt+F3) for recovery; openssh-server below covers remote fix.
 # foot, chromium deliberately omitted
 
 # --- Media: vlc + obs + imv (per 2026-09-10: keep imv) ---
 vlc
 obs-studio
 imv
+ffmpeg
+libva-utils
+intel-gpu-tools
 
 # --- Docs: evince only (per 2026-09-10: drop all LibreOffice) ---
 evince
 # libreoffice-* deliberately omitted
 
-# --- Printing / disks ---
+# --- Printing / disks / NVMe health ---
 cups
 cups-filters
 system-config-printer
 dosfstools
 exfatprogs
+nvme-cli
+smartmontools
 
-# --- Audio/Bluetooth/Network ---
+# --- Audio/Bluetooth/Network/WiFi (ThinkPad T14s Intel) ---
 pipewire
 pipewire-alsa
 pipewire-jack-audio-connection-kit
@@ -69,9 +77,29 @@ pamixer
 alsa-utils
 bluez
 bluez-tools
+blueman
 NetworkManager
+NetworkManager-wifi
+wpa_supplicant
+iw
+wireless-regdb
+ModemManager
 avahi
 nss-mdns
+upower
+xdg-desktop-portal
+xdg-user-dirs
+xdg-utils
+
+# --- Input: mouse / ThinkPad TrackPoint + touchpad (Intel T14s) ---
+# Hyprland/Wayland uses libinput directly. Without these there is no
+# touchpad/TrackPoint config tools, no XWayland/SDDM fallback driver,
+# and no visible cursor theme (looks like "no mouse").
+libinput
+libinput-utils
+xorg-x11-drv-libinput
+xorg-x11-drv-evdev
+adwaita-cursor-theme
 
 # --- system drivers: Intel iGPU only (your choice) ---
 # iwl*/WiFi firmware covered by linux-firmware below — no separate iwl pkgs on Fedora.
@@ -85,9 +113,28 @@ tuned-ppd
 brightnessctl
 ddcutil
 bolt
+fwupd
+fprintd
+fprintd-pam
+powertop
+chrony
+zram-generator
 # NOTE: tuned-ppd INSTEAD of power-profiles-daemon — caelestia-shell requires
 # tuned-ppd and the two conflict (both provide the PowerProfiles1 service).
 # Same D-Bus API, so desktop battery profiles keep working.
+
+# --- Recovery / fallback UI (no second terminal per owner — Warp only) ---
+# If Warp fails use TTY Ctrl+Alt+F3 + ssh. nano stays because neovim
+# keybinds fail under stress; waybar/rofi/mako/cliphist are fallbacks until
+# Omarchy Quickshell bar is ported (system_files has no shell QML yet).
+openssh-server
+openssh-clients
+nano
+waybar
+rofi-wayland
+mako
+cliphist
+omacalc
 
 # --- Containers: podman + distrobox (replace docker stack) ---
 podman

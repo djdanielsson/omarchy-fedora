@@ -1,0 +1,6 @@
+-- Personal bindings. Loaded after Omarchy-Fedora defaults (Warp-only).
+-- Full Omarchy bindings reference: omacom/omarchy quattro default/hypr/bindings/.
+-- Example: rebind terminal (not needed — Warp is already the default):
+-- o.rebind("SUPER + Return", "Terminal", o.launch("warp-terminal"))
+-- Example extra workspace:
+-- o.bind("SUPER + 6", "Workspace 6", hl.dsp.workspace("6"))

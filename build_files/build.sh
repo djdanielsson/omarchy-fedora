@@ -69,6 +69,12 @@ systemctl enable tuned-ppd.service || true
 systemctl enable firewalld.service || true
 systemctl enable podman.socket || true
 systemctl enable tailscaled.service || true
+systemctl enable chronyd.service || true
+systemctl enable sshd.service || true
+systemctl enable fprintd.service || true
+systemctl enable ModemManager.service || true
+systemctl enable upower.service || true
+systemctl enable fwupd-refresh.timer || true
 # First-boot flatpak provisioning (/var is local state — see service file)
 systemctl enable omarchy-firstboot-flatpak.service || true
 # Caelestia shell (lock screen) autostart if the COPR ships a user unit
@@ -84,7 +90,8 @@ flatpak install -y --system flathub com.bitwarden.desktop || echo "WARNING: bitw
 
 # 6. Remove anything pulled in by base we explicitly don't want
 # fedora-bootc:44 is minimal already — nothing to remove here.
-# We deliberately do NOT install: docker*, chromium, foot, webapps, clang/llvm/ruby/lua toolchains.
+# We deliberately do NOT install: docker*, chromium, webapps, clang/llvm/ruby/lua toolchains.
+# No second terminal per owner choice — Warp only (foot omitted on purpose).
 
 # 7. xdg-terminal-exec default -> warp (overrides Omarchy foot default)
 mkdir -p /etc/xdg/xdg-terminal-exec

@@ -1,0 +1,5 @@
+-- Personal look-and-feel overrides. Loaded after Omarchy-Fedora defaults.
+-- Theme overrides land in ~/.local/state/omarchy/current/theme/hyprland.lua
+-- once the Lumon theme port lands; put manual tweaks here.
+-- Example:
+-- hl.config({ general = { gaps_in = 4, gaps_out = 8 } })
