@@ -1,0 +1,43 @@
+#!/bin/bash
+# omarchy:summary=User-level security watch: auth-failure bursts + rpm integrity
+# Runs from a user timer (no root). Alerts only on NEW findings since the
+# last run (baseline in ~/.local/state) to avoid daily nagging.
+# - sudo/PAM auth failures in the last 24h (burst = someone guessing)
+# - digest/size/mode/owner drift in security-critical packages
+set -uo pipefail
+
+STATE_DIR="${XDG_STATE_HOME:-$HOME/.local/state}/omarchy/security-watch"
+mkdir -p "$STATE_DIR"
+BASELINE="$STATE_DIR/baseline"
+
+# Security-critical packages: cheap to verify (seconds), high value.
+CRITICAL_PKGS="sudo shadow-utils systemd pam polkit bash coreutils curl openssl openssh-server openssh-clients flatpak firewalld NetworkManager gnupg2 authselect"
+
+findings=()
+
+auth_failures=$(journalctl --since "24 hours ago" --no-pager 2>/dev/null | \
+  grep -ciE "authentication failure|failed password|auth could not identify|conversation failed" || true)
+if (( auth_failures > 5 )); then
+  findings+=("$auth_failures auth failures in 24h")
+fi
+
+# rpm verify flag field is 9 chars: keep entries with any real change
+# (S/M/5/D/L/U/G/P), drop mtime-only (T) and untestable (?) noise.
+current=$(rpm -V $CRITICAL_PKGS 2>/dev/null | awk '{ f = substr($0, 1, 9); gsub(/[. ?]/, "", f); if (f != "" && f != "T") print }' | sort -u || true)
+previous=""
+[[ -f $BASELINE ]] && previous=$(sort -u "$BASELINE")
+new_entries=$(comm -13 <(printf '%s\n' "$previous") <(printf '%s\n' "$current") || true)
+if [[ -n $new_entries ]]; then
+  count=$(printf '%s\n' "$new_entries" | wc -l)
+  findings+=("$count new rpm integrity findings")
+  logger -t omarchy-security-watch "new: $(printf '%s' "$new_entries" | head -n 5 | tr '\n' ';')"
+fi
+printf '%s\n' "$current" > "$BASELINE"
+
+if (( ${#findings[@]} > 0 )); then
+  body=$(printf '%s\n' "${findings[@]}")
+  omarchy-notification-send -g 󰻌 -u critical "Security watch" "$body" -t 30000 || \
+    notify-send -u critical "Security watch" "$body" || true
+  exit 1
+fi
+exit 0

@@ -1,0 +1,39 @@
+#!/bin/bash
+# omarchy:summary=First-run fingerprint enrollment offer
+# Runs from the firstrun unit after GitHub setup. Skips quietly when there is
+# no terminal, no fprintd tooling, no reader, or fingers already enrolled —
+# enrollment itself can't be imaged (needs the user's physical finger), so
+# this only automates the offer. Safe to re-run; exiting 0 everywhere keeps
+# the oneshot unit green.
+set -uo pipefail
+
+[[ -t 0 ]] || exit 0
+command -v fprintd-enroll >/dev/null 2>&1 || exit 0
+command -v fprintd-list >/dev/null 2>&1 || exit 0
+
+# NOTE: match the negative ("no fingers enrolled") — the positive word
+# "finger" also appears in that sentence and would false-positive.
+# (fprintd-list with no username arg just prints usage.)
+list_out=$(fprintd-list "$USER" 2>/dev/null || true)
+grep -qiE "found [1-9]" <<<"$list_out" || exit 0
+grep -qi "no fingers enrolled" <<<"$list_out" || exit 0
+
+echo
+echo "=== Fingerprint unlock ==="
+echo "No fingers enrolled. A fingerprint unlocks the lock screen and sudo"
+echo "(already configured system-wide) without typing your password."
+read -r -p "Enroll a fingerprint now? [Y/n] " answer || exit 0
+[[ $answer =~ ^[Nn] ]] && exit 0
+
+echo "Swipe the same finger several times when prompted."
+if fprintd-enroll "$USER"; then
+  echo "Verifying — swipe once more."
+  if fprintd-verify "$USER" 2>/dev/null || fprintd-verify 2>/dev/null; then
+    echo "Fingerprint ready for lock screen and sudo."
+  else
+    echo "Verification failed — run 'fprintd-enroll' later to retry."
+  fi
+else
+  echo "Enrollment failed — run 'fprintd-enroll' later to retry."
+fi
+exit 0

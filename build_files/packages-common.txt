@@ -44,7 +44,7 @@ ffmpegthumbnailer
 gnome-disk-utility
 
 # --- Browser / Terminal (your swap) ---
-firefox
+# firefox via Flathub (sandboxed, Downloads-only) — see firstboot flatpak
 xdg-terminal-exec
 # warp installed via .rpm in build.sh, not dnf. No fallback terminal per
 # owner choice — Warp only. NOTE: if Warp fails (no network/GPU/login),

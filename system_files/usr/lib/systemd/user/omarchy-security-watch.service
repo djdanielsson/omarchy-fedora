@@ -1,0 +1,6 @@
+[Unit]
+Description=Omarchy daily security watch (auth failures + rpm integrity)
+
+[Service]
+Type=oneshot
+ExecStart=/usr/local/bin/omarchy-security-watch

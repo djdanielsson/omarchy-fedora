@@ -1,0 +1,10 @@
+[Unit]
+Description=Run security watch daily and shortly after login
+
+[Timer]
+OnBootSec=10min
+OnUnitActiveSec=24h
+Persistent=true
+
+[Install]
+WantedBy=default.target

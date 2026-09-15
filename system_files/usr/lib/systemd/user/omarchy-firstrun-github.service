@@ -1,13 +1,14 @@
 [Unit]
-Description=Omarchy first-run GitHub setup (once per user)
+Description=Omarchy first-run setup: GitHub + fingerprint enrollment (once per user)
 After=graphical-session.target
 Wants=graphical-session.target
 ConditionPathExists=!%h/.local/state/omarchy/setup-github-done
 
 [Service]
 Type=oneshot
-# Floating terminal with the interactive setup; script exits quietly without a TTY.
+# Floating terminal with the interactive setup; scripts exit quietly without a TTY.
 ExecStart=/usr/bin/uwsm-app -- xdg-terminal-exec --app-id=org.omarchy.github-setup -e /usr/local/bin/omarchy-setup-github
+ExecStart=/usr/bin/uwsm-app -- xdg-terminal-exec --app-id=org.omarchy.fingerprint-setup -e /usr/local/bin/omarchy-setup-fingerprint
 
 [Install]
 WantedBy=default.target

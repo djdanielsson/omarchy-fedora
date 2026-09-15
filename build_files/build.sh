@@ -228,6 +228,23 @@ open(p, "w", encoding="utf-8").write(s)
 EOF
 fi
 
+# 7f. Lock fingerprint false-positive (2026-09-12): the enrolled check greps
+# for "finger", which also matches "no fingers enrolled" — phantom icon plus
+# PAM error spam with nothing enrolled. Match the negative instead.
+LOCK_SVC=/usr/share/omarchy-fedora/shell/plugins/lock/Service.qml
+if [[ -f $LOCK_SVC ]]; then
+  python3 - "$LOCK_SVC" <<'EOF' || echo "WARNING: lock Service.qml fingerprint patch failed"
+import sys
+p = sys.argv[1]
+s = open(p, encoding="utf-8").read()
+old = 'fprintd-list \\"$USER\\" 2>/dev/null | grep -qi finger; then echo yes; else echo no; fi'
+new = 'out=$(fprintd-list \"$USER\" 2>/dev/null || true); if echo \"$out\" | grep -qiE \"found [1-9]\" && ! echo \"$out\" | grep -qi \"no fingers enrolled\"; then echo yes; else echo no; fi'
+assert s.count(old) == 1, "fingerprint check not found"
+s = s.replace(old, new, 1)
+open(p, "w", encoding="utf-8").write(s)
+EOF
+fi
+
 # 8. Cleanup
 dnf clean all
 rm -rf /var/cache/* /tmp/*
