@@ -418,7 +418,14 @@ Item {
 
   Process {
     id: fingerprintCheckProc
-    command: ["bash", "-c", "if [[ -f /etc/pam.d/omarchy-lock-fingerprint ]] && command -v fprintd-list >/dev/null 2>&1 && fprintd-list \"$USER\" 2>/dev/null | grep -qi finger; then echo yes; else echo no; fi"]
+    command: ["bash", "-c", "if [[ -f /etc/pam.d/omarchy-lock-fingerprint ]] && command -v fprintd-list >/dev/null 2>&1 && out=$(fprintd-list \"$USER\" 2>/dev/null || true) && echo \"$out\" | grep -qiE \"found [1-9]\" && ! echo \"$out\" | grep -qi \"no fingers enrolled\"; then echo yes; else echo no; fi"]
+    // NOTE: inner double-quotes MUST stay backslash-escaped (\"). This is a
+    // double-quoted QML string: a bare " ends it and the whole lock plugin
+    // fails to load (2026-09-17: unescaped quotes -> "Expected token ','"
+    // at this line -> `lock` IPC target missing -> lock screen dead).
+    // The grep logic itself matters too: plain `grep -qi finger` matches
+    // fprintd's own "no fingers enrolled" text and shows a phantom
+    // fingerprint prompt, so match "found [1-9]" and exclude the negative.
     stdout: StdioCollector { id: fingerprintCheckStdout; waitForEnd: true }
     onExited: {
       root.fingerprintConfigured = String(fingerprintCheckStdout.text || "").trim() === "yes"

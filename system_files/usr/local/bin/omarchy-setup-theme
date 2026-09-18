@@ -1,0 +1,17 @@
+#!/bin/bash
+# omarchy:summary=First-run default theme seed (lumon wallpaper + palette)
+# Runs once per user on first graphical login (see
+# omarchy-firstrun-theme.service). Non-interactive and idempotent: exits
+# quietly when a theme was already applied. Without this, fresh installs
+# boot with theme "Unknown" and no background symlink, so omarchy-shell
+# renders no wallpaper (seen 2026-09-17: empty ~/.local/state/omarchy/current/).
+set -uo pipefail
+
+CURRENT_THEME_DIR="${XDG_STATE_HOME:-$HOME/.local/state}/omarchy/current/theme"
+[[ -e $CURRENT_THEME_DIR ]] && exit 0
+
+# Needs the graphical session (OMARCHY_PATH, shell IPC). If we somehow run
+# without one, defer to next login rather than half-applying.
+[[ -n ${OMARCHY_PATH:-} ]] || exit 0
+
+exec omarchy-theme-set lumon

@@ -76,8 +76,14 @@ systemctl enable tuned-ppd.service || true
 systemctl enable firewalld.service || true
 # LocalSend (LAN share, Flathub at first boot): allow its port through the
 # default public zone in the image so discovery works out of the box.
-firewall-cmd --permanent --add-port=53317/tcp 2>/dev/null || true
-firewall-cmd --permanent --add-port=53317/udp 2>/dev/null || true
+# NOTE: must use firewall-offline-cmd here, not firewall-cmd --permanent:
+# there is no running firewalld/D-Bus during container builds, so
+# firewall-cmd always fails (previously hidden by 2>/dev/null || true and
+# the image shipped without the rule). The declarative override in
+# system_files/etc/firewalld/zones/public.xml is the source of truth;
+# this is idempotent belt-and-suspenders for the build.
+firewall-offline-cmd --zone=public --add-port=53317/tcp || true
+firewall-offline-cmd --zone=public --add-port=53317/udp || true
 systemctl enable podman.socket || true
 systemctl enable tailscaled.service || true
 systemctl enable chronyd.service || true
@@ -90,6 +96,10 @@ systemctl enable fwupd-refresh.timer || true
 systemctl enable omarchy-firstboot-flatpak.service || true
 # First-run per-user GitHub setup prompt (runs once on first login)
 systemctl --global enable omarchy-firstrun-github.service || true
+# First-run per-user default theme seed (lumon wallpaper + palette, once per
+# user, no-op when a theme already exists — otherwise fresh installs boot
+# with theme "Unknown" and no background).
+systemctl --global enable omarchy-firstrun-theme.service || true
 # Auto timezone from location (tzupdate via timer + NM dispatcher)
 systemctl enable omarchy-tzupdate.timer || true
 # sudoers for passwordless desktop helpers (DNS switch from UI)

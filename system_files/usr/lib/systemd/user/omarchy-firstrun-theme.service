@@ -1,0 +1,15 @@
+[Unit]
+Description=Omarchy first-run setup: apply default theme + wallpaper (once per user)
+After=graphical-session.target
+Wants=graphical-session.target
+# Seeds ~/.local/state/omarchy/current/{theme,background,theme.name} via
+# omarchy-setup-theme (lumon) when no theme was ever applied. The script is
+# idempotent, so this is a no-op for users who already picked a theme.
+ConditionPathExists=!%h/.local/state/omarchy/current/theme
+
+[Service]
+Type=oneshot
+ExecStart=/usr/local/bin/omarchy-setup-theme
+
+[Install]
+WantedBy=default.target
