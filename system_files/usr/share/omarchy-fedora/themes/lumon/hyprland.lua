@@ -1,7 +1,7 @@
-local active_border_color = "rgb(f2fcff)"
-local active_shadow_color = "rgb(6fb8e3)"
-local inactive_border_color = "rgba(30486099)"
-local inactive_shadow_color = "rgba(30486077)"
+local active_border_color = "rgb(d5f2ff)"
+local active_shadow_color = "rgb(35c8f0)"
+local inactive_border_color = "rgba(23404f99)"
+local inactive_shadow_color = "rgba(23404f77)"
 
 hl.config({
   general = {

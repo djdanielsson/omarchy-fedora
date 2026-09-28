@@ -1,0 +1,10 @@
+# Warp appearance seed for new users (image default). Warp merges the rest
+# from its built-ins; the Settings UI syncs back here bidirectionally.
+# theme values: built-ins like "cyber_wave", "dracula", "gruvbox_dark", or a
+# custom yaml in ~/.local/share/warp-terminal/themes/. zoom_level is a
+# window percentage (100 = default).
+[appearance.themes]
+theme = "cyber_wave"
+
+[appearance.window]
+zoom_level = 70
