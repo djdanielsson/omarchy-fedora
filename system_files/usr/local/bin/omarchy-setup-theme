@@ -14,4 +14,8 @@ CURRENT_THEME_DIR="${XDG_STATE_HOME:-$HOME/.local/state}/omarchy/current/theme"
 # without one, defer to next login rather than half-applying.
 [[ -n ${OMARCHY_PATH:-} ]] || exit 0
 
-exec omarchy-theme-set lumon
+omarchy-theme-set lumon
+# The house wallpaper (vendored in the lumon theme). theme-set alone picks
+# the alphabetical default, so pin ours explicitly.
+DEFAULT_BG="$OMARCHY_PATH/themes/lumon/backgrounds/tux-circuit.png"
+[[ -f $DEFAULT_BG ]] && omarchy-theme-bg-set "$DEFAULT_BG" || true
