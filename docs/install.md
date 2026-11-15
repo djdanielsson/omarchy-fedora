@@ -4,23 +4,23 @@
 
 Every push to `main` and the weekly rebuild publish:
 
-- `ghcr.io/djdanielsson/omarchy-fedora:44` — tracked, `bootc upgrade` pulls this
-- `ghcr.io/djdanielsson/omarchy-fedora:YYYYMMDD-44` — pinned backup
+- `ghcr.io/djdanielsson/omarchy-fedora:45` — tracked, `bootc upgrade` pulls this
+- `ghcr.io/djdanielsson/omarchy-fedora:YYYYMMDD-45` — pinned backup
 
-The ISO artifact `omarchy-fedora-44-iso` is built *from* `:44` and is only the installer.
+The ISO artifact `omarchy-fedora-45-iso` is built *from* `:45` and is only the installer.
 
 ## Fresh machine — ISO
 
-1. Download `omarchy-fedora-44-iso` from Actions.
+1. Download `omarchy-fedora-45-iso` from Actions.
 2. Flash to USB, boot, install via Anaconda.
-3. First boot already tracks `:44`; Flathub/Bitwarden/LocalSend/Firefox install via `omarchy-firstboot-flatpak.service` (see [Configuration](configuration.md#first-boot)).
+3. First boot already tracks `:45`; Flathub/Bitwarden/LocalSend/Firefox/Steam install via `omarchy-firstboot-flatpak.service` (see [Configuration](configuration.md#first-boot)).
 
 ## Existing Atomic/bootc machine — rebase
 
 No reinstall needed:
 
 ```bash
-sudo bootc switch --enforce-container-sigpolicy ghcr.io/djdanielsson/omarchy-fedora:44
+sudo bootc switch --enforce-container-sigpolicy ghcr.io/djdanielsson/omarchy-fedora:45
 sudo systemctl reboot
 ```
 

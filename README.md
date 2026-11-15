@@ -1,10 +1,10 @@
 # omarchy-fedora-bootc
 
-Fedora 44 `bootc` image-mode desktop with Omarchy's Hyprland UI. Reproducible, atomic, roll-backable.
+Fedora 45 `bootc` image-mode desktop with Omarchy's Hyprland UI. Reproducible, atomic, roll-backable.
 
-- **Base:** `quay.io/fedora/fedora-bootc:44`
+- **Base:** `quay.io/fedora/fedora-bootc:45`
 - **Desktop:** Hyprland 0.56.2 + Quickshell + SDDM + uwsm (ported from Omarchy)
-- **Apps:** Firefox (Flathub, Downloads-only), Warp, Nautilus, VLC/OBS/imv, Neovim
+- **Apps:** Firefox (Flathub, Downloads-only), Steam (Flathub), Warp, Nautilus, VLC/OBS/imv, Neovim
 - **Stack:** Flatpak/Flathub, Tailscale, Podman/Distrobox, tuned-ppd
 
 ## Quick start
@@ -14,7 +14,7 @@ See [docs/install.md](docs/install.md) for ISO vs `bootc switch`, and [docs/upda
 ```bash
 # Fresh machine: flash the ISO artifact, install via Anaconda.
 # Existing Atomic/bootc machine:
-sudo bootc switch --enforce-container-sigpolicy ghcr.io/djdanielsson/omarchy-fedora:44
+sudo bootc switch --enforce-container-sigpolicy ghcr.io/djdanielsson/omarchy-fedora:45
 ```
 
 First boot prompts for GitHub (`user.name`/`email` + `gh auth`) and offers fingerprint enrollment, then:
@@ -34,7 +34,7 @@ mise trust && mise install
 ## Repo layout
 
 ```
-Containerfile                  # FROM fedora-bootc:44
+Containerfile                  # FROM fedora-bootc:45
 build_files/build.sh           # repos, dnf, flatpak, services, QML patches
 build_files/packages-common.txt# package set (one per line, # comments stripped)
 system_files/                  # /usr + /etc overlay (sddm session, PAM, skel, bin shims)

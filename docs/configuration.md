@@ -11,7 +11,7 @@
 
 ## First boot
 
-- **Flatpak:** `omarchy-firstboot-flatpak.service` adds Flathub, installs Bitwarden/LocalSend/Firefox, applies LocalSend home override; retries until success, then touches a done-file.
+- **Flatpak:** `omarchy-firstboot-flatpak.service` adds Flathub, installs Bitwarden/LocalSend/Firefox/Steam, applies LocalSend home override; retries until success, then touches a done-file.
 - **Per-user:** `omarchy-firstrun-github.service` (global user unit) opens a floating terminal once to set `git user.name`/`email` + `gh auth` + offers `fprintd-enroll` (see [Fingerprint](fingerprint.md)).
 
 ## Auto timezone

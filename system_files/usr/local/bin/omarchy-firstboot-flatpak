@@ -1,6 +1,7 @@
 #!/usr/bin/env bash
 # First-boot only (see omarchy-firstboot-flatpak.service): Flathub + Bitwarden
-# + LocalSend. Retried every boot until it succeeds (done-file gates it).
+# + LocalSend + Firefox + Steam. Retried every boot until it succeeds
+# (done-file gates it).
 # 2026-09-12 fix: boot races network-online (DNS not ready) — retry remote-add
 # a few times instead of failing the whole unit on first transient error.
 set -uo pipefail
@@ -18,6 +19,8 @@ done
 flatpak install -y --system flathub com.bitwarden.desktop || exit 1
 flatpak install -y --system flathub org.localsend.localsend_app || exit 1
 flatpak install -y --system flathub org.mozilla.firefox || exit 1
+# Steam from Flathub (not RPM Fusion): avoids i686 multilib deps on bootc.
+flatpak install -y --system flathub com.valvesoftware.Steam || exit 1
 # LocalSend sandbox can only see xdg-download, which fails to mount on Atomic
 # (/home -> /var/home symlink); without this, receives log to history but the
 # save silently fails. Live-verified with the explicit path; image uses `home`

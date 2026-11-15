@@ -1,9 +1,9 @@
-# Fedora 44 dnf equivalents for your Omarchy selection
+# Fedora 45 dnf equivalents for your Omarchy selection
 # Format: one package per line. Lines starting with # ignored by build.sh.
 # Arch name -> Fedora name notes inline.
 
 # --- Desktop UI (same as Omarchy for the moment) ---
-# Hyprland stack via agaspar/omedora-4 COPR (see build.sh). quickshell is stock Fedora 44.
+# Hyprland stack via agaspar/omedora-4 COPR (see build.sh). quickshell is stock Fedora 45.
 # Lock/idle differ from Omarchy: swaylock+swayidle (stock) instead of hyprlock+hypridle,
 # because mixing a second Hyprland COPR causes hyprutils version conflicts.
 hyprland
@@ -14,6 +14,7 @@ swayidle
 qt6-qtwayland
 # Lock screen: Caelestia (COPR randalthor17/caelestia-fedora — built against plain
 # quickshell, unlike gmanka/caelestia which needs conflicting quickshell-git).
+# NOTE: pinned to the fedora-44 chroot in build.sh — no F45 build yet.
 # lock/idle services; bar is suppressed via excludedScreens (see skel shell.json
 # + omarchy-caelestia-lock-only). swaylock stays as fallback.
 caelestia-shell

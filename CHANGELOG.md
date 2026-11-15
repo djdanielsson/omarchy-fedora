@@ -5,7 +5,12 @@ All notable changes to this image. Dates are UTC. The live system on the T14s is
 ## [Unreleased]
 
 ### Changed
+- Base image bumped to `quay.io/fedora/fedora-bootc:45`; GHCR/ISO tags are now `:45` / `YYYYMMDD-45` / `omarchy-fedora-45-iso`. RPM Fusion release packages updated to 45.
+- Caelestia COPR pinned to its `fedora-44` chroot: `randalthor17/caelestia-fedora` has no fedora-45 build yet.
 - Firefox now ships as Flathub `org.mozilla.firefox` (Downloads-only sandbox) instead of the Fedora RPM.
+
+### Added
+- Steam via Flathub `com.valvesoftware.Steam`, installed by `omarchy-firstboot-flatpak.service` (fresh installs only).
 
 ## 2026-09-12
 

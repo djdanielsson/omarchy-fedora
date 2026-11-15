@@ -6,6 +6,7 @@
 - **SDDM / login theme:** `sddm-themes` installed, derived `omarchy` theme from maldives.
 - **Auto timezone stuck on UTC:** check `omarchy-tzupdate.timer` + NM dispatcher; `timedatectl` and `journalctl -u omarchy-tzupdate`.
 - **LocalSend not saving:** Flatpak needs `home` on Atomic; check `flatpak info --show-permissions org.localsend.localsend_app`.
+- **Firefox downloads fail:** `~/.config/user-dirs.dirs` missing → download dir falls back to `$HOME`, which the Downloads-only sandbox denies. Fix: `xdg-user-dirs-update` + restart Firefox (autostart now runs it every login).
 - **Portal pickers huge:** pinned `xdg-desktop-portal-gtk` to 900×620 via `looknfeel.lua` skel.
 - **Wallpaper not showing:** `qt6-qtimageformats` required for `.webp`.
 

@@ -1,5 +1,5 @@
 [Unit]
-Description=Omarchy first-boot: add Flathub and install Bitwarden
+Description=Omarchy first-boot: add Flathub and install Bitwarden, LocalSend, Firefox, Steam
 Documentation=https://github.com/caelestia-dots/shell
 After=network-online.target
 Wants=network-online.target

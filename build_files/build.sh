@@ -7,7 +7,7 @@ ARCH="$(uname -m)" # x86_64 or aarch64
 # 1. Repos: dnf5 plugin names (this image uses dnf5, not dnf4)
 dnf install -y 'dnf5-command(copr)' dnf5-plugins
 
-# Hyprland + Omarchy ports (verified 2026-09-10 to have fedora-44 x86_64 chroots):
+# Hyprland + Omarchy ports (verified 2026-11-14 to have fedora-45 x86_64 chroots):
 # - agaspar/omedora-4: hyprland, hyprpicker, hyprsunset, xdg-desktop-portal-hyprland,
 #   hyprland-guiutils, uwsm, lazygit, starship, tensaku, herdr, omedora-nerd-fonts, ...
 # - whelanh/omarchy: aether, cliamp, omacalc, omacut, omawrite, hyprland-preview-share-picker
@@ -17,15 +17,34 @@ dnf install -y 'dnf5-command(copr)' dnf5-plugins
 # NOTE: single Hyprland source only. denorath/navigator-hyprland was dropped because its
 # hyprutils 0.10 conflicts with omedora-4's hyprutils 0.13/0.14. Lock/idle use stock
 # swaylock+swayidle instead of hyprlock+hypridle (see packages-common.txt).
-# quickshell intentionally NOT from COPR — it is in stock Fedora 44.
-for copr in agaspar/omedora-4 whelanh/omarchy randalthor17/caelestia-fedora; do
+# quickshell intentionally NOT from COPR — it is in stock Fedora 45.
+for copr in agaspar/omedora-4 whelanh/omarchy; do
   dnf copr enable -y "$copr" || echo "WARNING: COPR $copr enable failed"
 done
 
-# RPM Fusion free+tained needed for: vlc, obs-studio extras, intel-media-driver extras, codecs
+# Caelestia lock is PINNED to the fedora-44 chroot: as of 2026-11-14
+# randalthor17/caelestia-fedora has no fedora-45 build. F44-built Qt6/quickshell
+# packages may need revisiting once upstream publishes F45; at that point delete
+# this explicit repo and add randalthor17/caelestia-fedora back to the loop.
+rpm --import https://download.copr.fedorainfracloud.org/results/randalthor17/caelestia-fedora/pubkey.gpg || \
+  echo "WARNING: caelestia key import failed"
+cat > /etc/yum.repos.d/_copr_randalthor17-caelestia-fedora.repo <<'EOF'
+[copr:copr.fedorainfracloud.org:randalthor17:caelestia-fedora]
+name=Copr repo for caelestia-fedora owned by randalthor17 (fedora-44 chroot; F45 not built yet)
+baseurl=https://download.copr.fedorainfracloud.org/results/randalthor17/caelestia-fedora/fedora-44-x86_64/
+type=rpm-md
+skip_if_unavailable=True
+gpgcheck=1
+gpgkey=https://download.copr.fedorainfracloud.org/results/randalthor17/caelestia-fedora/pubkey.gpg
+repo_gpgcheck=0
+enabled=1
+enabled_metadata=1
+EOF
+
+# RPM Fusion free+nonfree needed for: vlc, obs-studio extras, intel-media-driver extras, codecs
 dnf install -y \
-  https://download1.rpmfusion.org/free/fedora/rpmfusion-free-release-44.noarch.rpm \
-  https://download1.rpmfusion.org/nonfree/fedora/rpmfusion-nonfree-release-44.noarch.rpm || echo "WARNING: rpmfusion install failed"
+  https://download1.rpmfusion.org/free/fedora/rpmfusion-free-release-45.noarch.rpm \
+  https://download1.rpmfusion.org/nonfree/fedora/rpmfusion-nonfree-release-45.noarch.rpm || echo "WARNING: rpmfusion install failed"
 
 # Tailscale repo (per 2026-09-10: tailscale wanted, Intel-only image)
 # 2026-09-12 fix: import repo GPG key non-interactively, otherwise every dnf
@@ -121,7 +140,7 @@ flatpak install -y --system flathub com.bitwarden.desktop || echo "WARNING: bitw
 # Tailscale sysusers/tmpfiles handled by rpm; no `tailscale up` at build time
 
 # 6. Remove anything pulled in by base we explicitly don't want
-# fedora-bootc:44 is minimal already — nothing to remove here.
+# fedora-bootc:45 is minimal already — nothing to remove here.
 # We deliberately do NOT install: docker*, chromium, webapps, clang/llvm/ruby/lua toolchains.
 # No second terminal per owner choice — Warp only (foot omitted on purpose).
 

@@ -4,10 +4,10 @@ This is image-mode — no `dnf upgrade` on the client.
 
 ```bash
 bootc status                         # tracked image + staged
-sudo bootc update                    # fetch :44, stage for next boot
+sudo bootc update                    # fetch :45, stage for next boot
 sudo bootc upgrade --apply --reboot  # fetch + reboot into it
 sudo bootc rollback                  # previous deployment
-flatpak update                       # Bitwarden, Firefox, LocalSend, etc.
+flatpak update                       # Bitwarden, Firefox, LocalSend, Steam, etc.
 ```
 
 Flatpak remotes/apps update in place; the OS itself only moves via `bootc`. The `bootc-fetch-apply-updates.timer` is enabled but the weekly GHCR rebuild is the real source.

@@ -24,7 +24,7 @@ jobs:
         id: tags
         run: |
           echo "date=$(date -u +%Y%m%d)" >> "$GITHUB_OUTPUT"
-          echo "ver=44" >> "$GITHUB_OUTPUT"
+          echo "ver=45" >> "$GITHUB_OUTPUT"
 
       - name: Login to GHCR
         uses: redhat-actions/podman-login@v1
@@ -36,11 +36,11 @@ jobs:
       - name: Build and push container image (source of truth for updates)
         run: |
           podman build -f Containerfile \
-            -t ghcr.io/${{ github.repository_owner }}/omarchy-fedora:44 \
-            -t ghcr.io/${{ github.repository_owner }}/omarchy-fedora:${{ steps.tags.outputs.date }}-44 \
+            -t ghcr.io/${{ github.repository_owner }}/omarchy-fedora:45 \
+            -t ghcr.io/${{ github.repository_owner }}/omarchy-fedora:${{ steps.tags.outputs.date }}-45 \
             .
-          podman push ghcr.io/${{ github.repository_owner }}/omarchy-fedora:44
-          podman push ghcr.io/${{ github.repository_owner }}/omarchy-fedora:${{ steps.tags.outputs.date }}-44
+          podman push ghcr.io/${{ github.repository_owner }}/omarchy-fedora:45
+          podman push ghcr.io/${{ github.repository_owner }}/omarchy-fedora:${{ steps.tags.outputs.date }}-45
 
   # ISO is only the installer. It embeds the GHCR ref above,
   # so systems installed from ISO track the container for `bootc upgrade`.
@@ -71,10 +71,10 @@ jobs:
             --type iso \
             --rootfs btrfs \
             --config /config.toml \
-            ghcr.io/${{ github.repository_owner }}/omarchy-fedora:44
+            ghcr.io/${{ github.repository_owner }}/omarchy-fedora:45
 
       - name: Upload ISO artifact
         uses: actions/upload-artifact@v4
         with:
-          name: omarchy-fedora-44-iso
+          name: omarchy-fedora-45-iso
           path: ./output/*.iso

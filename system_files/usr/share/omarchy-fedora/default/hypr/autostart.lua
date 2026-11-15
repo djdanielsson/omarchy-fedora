@@ -14,6 +14,13 @@ hl.on("hyprland.start", function()
   hl.exec_cmd("gnome-keyring-daemon --start --components=secrets,ssh,gpg")
   hl.exec_cmd("udiskie --automount --notify &")
 
+  -- XDG user dirs (~/Downloads, ~/Documents, ...). Hyprland doesn't
+  -- process /etc/xdg/autostart, so the GNOME-provided xdg-user-dirs entry
+  -- never runs here — without this, XDG_DOWNLOAD_DIR falls back to $HOME,
+  -- which the Firefox flatpak sandbox denies (!home), breaking all
+  -- downloads (2026-10-04). Idempotent: only creates what's missing.
+  hl.exec_cmd("xdg-user-dirs-update &")
+
   -- Omarchy shell (bar, panels, menus, notifications, lock). Supervised and
   -- journal-logged; use omarchy-restart-shell to restart it by hand.
   hl.exec_cmd("omarchy-launch-shell")

@@ -6,7 +6,7 @@ Defined in `build_files/packages-common.txt` (one per line, `#` ignored by `buil
 
 Hyprland + hyprpicker/sunset, swaylock/idle (hyprlock/hypridle skipped — hyprutils conflict), `xdg-desktop-portal-hyprland/gtk`, quickshell, `hyprland-guiutils`, uwsm, `mate-polkit`, SDDM + `sddm-themes` (derived `omarchy` theme), `qt6-qtimageformats` (every Lumon wallpaper is `.webp`).
 
-Lock screen is the Omarchy shell (`omarchy.lock`), not Caelestia — Caelestia's bar is suppressed via `excludedScreens` and only its lock would have been used, but the full dashboard leaked through so it was dropped. `swaylock` stays as fallback.
+Lock screen is the Omarchy shell (`omarchy.lock`), not Caelestia — Caelestia's bar is suppressed via `excludedScreens` and only its lock would have been used, but the full dashboard leaked through so it was dropped. `swaylock` stays as fallback. The Caelestia COPR is pinned to its `fedora-44` chroot on the Fedora 45 image because upstream has not published an F45 build yet.
 
 ## Apps
 
@@ -41,4 +41,4 @@ cups + filters, `dosfstools`/`exfatprogs`/`nvme-cli`/`smartmontools`, NetworkMan
 
 ## Flatpak
 
-`flatpak` + Flathub. First-boot installs Bitwarden, LocalSend, Firefox (can't bake into the image — `/var` is per-machine state). Firewall ports 53317/tcp+udp opened for LocalSend.
+`flatpak` + Flathub. First-boot installs Bitwarden, LocalSend, Firefox, Steam (can't bake into the image — `/var` is per-machine state). Firewall ports 53317/tcp+udp opened for LocalSend.
