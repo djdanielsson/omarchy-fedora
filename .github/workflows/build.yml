@@ -27,24 +27,30 @@ jobs:
           echo "ver=45" >> "$GITHUB_OUTPUT"
 
       - name: Login to GHCR
+        if: github.event_name != 'pull_request'
         uses: redhat-actions/podman-login@v1
         with:
           registry: ghcr.io
           username: ${{ github.actor }}
           password: ${{ secrets.GITHUB_TOKEN }}
 
-      - name: Build and push container image (source of truth for updates)
+      - name: Build and lint container image
         run: |
           podman build -f Containerfile \
             -t ghcr.io/${{ github.repository_owner }}/omarchy-fedora:45 \
             -t ghcr.io/${{ github.repository_owner }}/omarchy-fedora:${{ steps.tags.outputs.date }}-45 \
             .
+
+      - name: Publish container image (source of truth for updates)
+        if: github.event_name != 'pull_request'
+        run: |
           podman push ghcr.io/${{ github.repository_owner }}/omarchy-fedora:45
           podman push ghcr.io/${{ github.repository_owner }}/omarchy-fedora:${{ steps.tags.outputs.date }}-45
 
   # ISO is only the installer. It embeds the GHCR ref above,
   # so systems installed from ISO track the container for `bootc upgrade`.
   iso:
+    if: github.event_name != 'pull_request'
     needs: build
     runs-on: ubuntu-latest
     permissions:
