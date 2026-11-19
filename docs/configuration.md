@@ -4,7 +4,7 @@
 
 `build_files/build.sh` runs inside the container build (`Containerfile` copies `system_files/` + `build_files/`).
 
-- Enables COPRs: `agaspar/omedora-4`, `whelanh/omarchy`, `randalthor17/caelestia-fedora`; RPM Fusion free/nonfree; Tailscale repo (key imported non-interactively).
+- Enables the `agaspar/omedora-4` and `whelanh/omarchy` COPRs, RPM Fusion free/nonfree, and the Tailscale repo.
 - Installs `build_files/packages-common.txt`, Warp repo, `mise`, `tzupdate`.
 - Enables services: `sddm`, `NetworkManager`, `bluetooth`, `cups`, `thermald`, `tuned` + `tuned-ppd`, `firewalld`, `podman.socket`, `tailscaled`, `chronyd`, `fprintd`, `ModemManager`, `upower`, `fwupd-refresh.timer`, `omarchy-firstboot-flatpak`, per-user `omarchy-firstrun-github`.
 - Tweaks: `xdg-terminal-exec` → `warp.desktop`; derives SDDM `omarchy` theme from maldives + Lumon wallpaper (02); patches QML for BT visibility + calendar size + network Send button + clock clicks + lock fingerprint check.
@@ -20,7 +20,7 @@
 
 ## Bar & shell
 
-Skels for Hyprland (`~/.config/hypr/`), Omarchy shell (`~/.config/omarchy/shell.json` — media + mic widgets, Lumon default, 150s screensaver / 300s lock), and Caelestia shell.json (background off, lock on, bar excluded on all outputs).
+Skeleton configs cover Hyprland (`~/.config/hypr/`) and the Omarchy shell (`~/.config/omarchy/shell.json`, media and mic widgets, Lumon default, 150s screensaver and 300s lock).
 
 ## Known image patches
 

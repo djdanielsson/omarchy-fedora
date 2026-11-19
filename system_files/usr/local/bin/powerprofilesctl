@@ -1,7 +1,6 @@
 #!/bin/bash
 # powerprofilesctl compat shim for Fedora tuned-ppd images.
-# tuned-ppd and power-profiles-daemon conflict (both provide PowerProfiles1),
-# and caelestia-shell requires tuned-ppd — so PPD cannot be installed.
+# tuned-ppd and power-profiles-daemon conflict (both provide PowerProfiles1).
 # This shim exposes the subset Omarchy uses (get/set/list) backed by the
 # tuned-ppd D-Bus API (net.hadess.PowerProfiles), which is wire-compatible.
 # Verified 2026-09-12 on T14s AX201: get/set/list + omarchy-powerprofiles-*

@@ -6,6 +6,6 @@
 -- o.bind("SUPER + 6", "Workspace 6", hl.dsp.workspace("6"))
 
 -- App launcher alias (2026-09-12 fix): SUPER+D opens the Omarchy apps menu,
--- same as SUPER+ALT+SPACE. Native quickshell menu is primary; rofi/wofi/fuzzel
+-- same as SUPER+ALT+SPACE. Native quickshell menu is primary; rofi/fuzzel
 -- remain installed as fallback (e.g. `rofi -show drun` when the shell is down).
 o.bind("SUPER + D", "Apps menu", "omarchy-menu toggle apps")

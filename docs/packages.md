@@ -6,7 +6,7 @@ Defined in `build_files/packages-common.txt` (one per line, `#` ignored by `buil
 
 Hyprland + hyprpicker/sunset, swaylock/idle (hyprlock/hypridle skipped — hyprutils conflict), `xdg-desktop-portal-hyprland/gtk`, quickshell, `hyprland-guiutils`, uwsm, `mate-polkit`, SDDM + `sddm-themes` (derived `omarchy` theme), `qt6-qtimageformats` (every Lumon wallpaper is `.webp`).
 
-Lock screen is the Omarchy shell (`omarchy.lock`), not Caelestia — Caelestia's bar is suppressed via `excludedScreens` and only its lock would have been used, but the full dashboard leaked through so it was dropped. `swaylock` stays as fallback. The Caelestia COPR is pinned to its `fedora-44` chroot on the Fedora 45 image because upstream has not published an F45 build yet.
+The bundled Omarchy shell handles screen locking. `swayidle` invokes it on idle and before sleep, and `swaylock` remains available as a fallback. Fedora 45 packages the Font Awesome desktop fonts as `fontawesome-fonts-all`.
 
 ## Apps
 
@@ -29,7 +29,7 @@ cups + filters, `dosfstools`/`exfatprogs`/`nvme-cli`/`smartmontools`, NetworkMan
 
 ### Power / thermals
 
-`tuned` + `tuned-ppd` (PAM conflict: `tuned-ppd` and `power-profiles-daemon` both provide `PowerProfiles1`; Caelestia requires `tuned-ppd`, so `powerprofilesctl` is a tuned-ppd D-Bus shim in `system_files/usr/local/bin/`). `thermald`, `brightnessctl`, `ddcutil`, `bolt`, `fwupd`, `powertop`, `chrony`, `zram-generator`.
+`tuned` + `tuned-ppd`, with a `powerprofilesctl` shim for the `PowerProfiles1` D-Bus interface. `thermald`, `brightnessctl`, `ddcutil`, `bolt`, `fwupd`, `powertop`, `chrony`, `zram-generator`.
 
 ### Recovery
 

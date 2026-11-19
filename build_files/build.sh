@@ -11,35 +11,12 @@ dnf install -y 'dnf5-command(copr)' dnf5-plugins
 # - agaspar/omedora-4: hyprland, hyprpicker, hyprsunset, xdg-desktop-portal-hyprland,
 #   hyprland-guiutils, uwsm, lazygit, starship, tensaku, herdr, omedora-nerd-fonts, ...
 # - whelanh/omarchy: aether, cliamp, omacalc, omacut, omawrite, hyprland-preview-share-picker
-# - randalthor17/caelestia-fedora: caelestia-shell + caelestia-cli built against
-#   plain quickshell (gmanka/caelestia was dropped: it hard-requires quickshell-git,
-#   which conflicts with stock AND omedora-4 quickshell).
 # NOTE: single Hyprland source only. denorath/navigator-hyprland was dropped because its
-# hyprutils 0.10 conflicts with omedora-4's hyprutils 0.13/0.14. Lock/idle use stock
-# swaylock+swayidle instead of hyprlock+hypridle (see packages-common.txt).
-# quickshell intentionally NOT from COPR — it is in stock Fedora 45.
+# hyprutils 0.10 conflicts with omedora-4's hyprutils 0.13/0.14.
+# The bundled Omarchy shell handles locking via Fedora's quickshell.
 for copr in agaspar/omedora-4 whelanh/omarchy; do
   dnf copr enable -y "$copr" || echo "WARNING: COPR $copr enable failed"
 done
-
-# Caelestia lock is PINNED to the fedora-44 chroot: as of 2026-11-14
-# randalthor17/caelestia-fedora has no fedora-45 build. F44-built Qt6/quickshell
-# packages may need revisiting once upstream publishes F45; at that point delete
-# this explicit repo and add randalthor17/caelestia-fedora back to the loop.
-rpm --import https://download.copr.fedorainfracloud.org/results/randalthor17/caelestia-fedora/pubkey.gpg || \
-  echo "WARNING: caelestia key import failed"
-cat > /etc/yum.repos.d/_copr_randalthor17-caelestia-fedora.repo <<'EOF'
-[copr:copr.fedorainfracloud.org:randalthor17:caelestia-fedora]
-name=Copr repo for caelestia-fedora owned by randalthor17 (fedora-44 chroot; F45 not built yet)
-baseurl=https://download.copr.fedorainfracloud.org/results/randalthor17/caelestia-fedora/fedora-44-x86_64/
-type=rpm-md
-skip_if_unavailable=True
-gpgcheck=1
-gpgkey=https://download.copr.fedorainfracloud.org/results/randalthor17/caelestia-fedora/pubkey.gpg
-repo_gpgcheck=0
-enabled=1
-enabled_metadata=1
-EOF
 
 # RPM Fusion free+nonfree needed for: vlc, obs-studio extras, intel-media-driver extras, codecs
 dnf install -y \
@@ -123,8 +100,6 @@ systemctl --global enable omarchy-firstrun-theme.service || true
 systemctl enable omarchy-tzupdate.timer || true
 # sudoers for passwordless desktop helpers (DNS switch from UI)
 chmod 0440 /etc/sudoers.d/omarchy-dns 2>/dev/null || true
-# Caelestia shell (lock screen) autostart if the COPR ships a user unit
-systemctl --global enable caelestia-shell.service 2>/dev/null || true
 # bootc auto-update check (image-mode updates come from GHCR container, not dnf)
 # Weekly GHCR rebuild + `bootc upgrade` on client pulls it. Enable timer for staged check.
 systemctl enable bootc-fetch-apply-updates.timer || true

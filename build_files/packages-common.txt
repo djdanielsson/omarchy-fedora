@@ -4,21 +4,14 @@
 
 # --- Desktop UI (same as Omarchy for the moment) ---
 # Hyprland stack via agaspar/omedora-4 COPR (see build.sh). quickshell is stock Fedora 45.
-# Lock/idle differ from Omarchy: swaylock+swayidle (stock) instead of hyprlock+hypridle,
-# because mixing a second Hyprland COPR causes hyprutils version conflicts.
+# The bundled Omarchy shell handles locking. swayidle drives idle and pre-sleep
+# locking, and swaylock remains available as a fallback.
 hyprland
 hyprpicker
 hyprsunset
 swaylock
 swayidle
 qt6-qtwayland
-# Lock screen: Caelestia (COPR randalthor17/caelestia-fedora — built against plain
-# quickshell, unlike gmanka/caelestia which needs conflicting quickshell-git).
-# NOTE: pinned to the fedora-44 chroot in build.sh — no F45 build yet.
-# lock/idle services; bar is suppressed via excludedScreens (see skel shell.json
-# + omarchy-caelestia-lock-only). swaylock stays as fallback.
-caelestia-shell
-caelestia-cli
 xdg-desktop-portal-hyprland
 xdg-desktop-portal-gtk
 quickshell
@@ -135,8 +128,7 @@ fprintd-pam
 powertop
 chrony
 zram-generator
-# NOTE: tuned-ppd INSTEAD of power-profiles-daemon — caelestia-shell requires
-# tuned-ppd and the two conflict (both provide the PowerProfiles1 service).
+# tuned-ppd and power-profiles-daemon conflict (both provide PowerProfiles1).
 # Same D-Bus API, so desktop battery profiles keep working via the
 # powerprofilesctl shim + omarchy-powerprofiles-list/set in
 # system_files/usr/local/bin (2026-09-12 fix — PPD CLI can't be installed).
@@ -215,7 +207,7 @@ google-noto-emoji-color-fonts
 google-noto-sans-cjk-fonts
 jetbrains-mono-fonts
 omedora-nerd-fonts
-fontawesome-fonts
+fontawesome-fonts-all
 yaru-icon-theme
 # gnome-themes-extra: not packaged on Fedora — dropped (Adwaita + Omarchy themes cover it).
 
@@ -226,8 +218,9 @@ firewalld
 flatpak
 tailscale
 rofi
+fuzzel
 # rofi explicitly kept as fallback launcher (SUPER+D uses native omarchy-menu
 # apps by default; rofi -show drun still works when the shell is down).
-# fuzzel stays via caelestia-cli dep; wofi pulled as needed.
+# Keep fuzzel as an alternative fallback.
 # bitwarden via flatpak com.bitwarden.desktop in build.sh (per 2026-09-10)
 # ufw -> firewalld on Fedora (native to Atomic)
